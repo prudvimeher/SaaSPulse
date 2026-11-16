@@ -1,12 +1,58 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { CUSTOMERS } from '../data/customers'
+import type { NavSection } from './Sidebar'
 
 interface TopbarProps {
   onOpenMobileMenu: () => void
+  onNavigate?: (section: NavSection, customerId?: string) => void
 }
 
-export function Topbar({ onOpenMobileMenu }: TopbarProps) {
+const SECTIONS: readonly NavSection[] = [
+  'Executive Overview',
+  'Revenue Intelligence',
+  'Customer Retention',
+  'Customer Growth',
+  'Customer 360',
+]
+
+export function Topbar({ onOpenMobileMenu, onNavigate }: TopbarProps) {
   const [quickSearch, setQuickSearch] = useState('')
   const [showNotifications, setShowNotifications] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement | null>(null)
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        searchInputRef.current?.focus()
+      }
+      if (event.key === 'Escape') {
+        setQuickSearch('')
+        setShowNotifications(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
+  const searchResults = useMemo(() => {
+    const q = quickSearch.trim().toLowerCase()
+    if (!q) return { pages: [], customers: [] }
+
+    const pages = SECTIONS.filter((section) =>
+      section.toLowerCase().includes(q),
+    )
+    const customers = CUSTOMERS.filter(
+      (customer) =>
+        customer.name.toLowerCase().includes(q) ||
+        customer.email.toLowerCase().includes(q) ||
+        customer.plan.toLowerCase().includes(q),
+    ).slice(0, 5)
+
+    return { pages, customers }
+  }, [quickSearch])
+
+  const hasSearchQuery = quickSearch.trim().length > 0
 
   return (
     <header className="h-14 shrink-0 bg-white border-b border-[#E6E8EF] px-4 sm:px-6 flex items-center justify-between gap-4">
@@ -47,6 +93,7 @@ export function Topbar({ onOpenMobileMenu }: TopbarProps) {
             <path d="m21 21-4.3-4.3" />
           </svg>
           <input
+            ref={searchInputRef}
             type="search"
             value={quickSearch}
             onChange={(event) => setQuickSearch(event.target.value)}
@@ -57,6 +104,49 @@ export function Topbar({ onOpenMobileMenu }: TopbarProps) {
           <kbd className="pointer-events-none hidden sm:inline-flex items-center gap-0.5 rounded border border-[#E4E7EC] bg-white px-1.5 py-0.5 text-[10.5px] font-medium text-[#667085] absolute right-2 top-1/2 -translate-y-1/2">
             ⌘ K
           </kbd>
+
+          {hasSearchQuery && (
+            <div className="absolute left-0 right-0 top-10 z-30 rounded-xl border border-[#E4E7EC] bg-white p-2 shadow-lg space-y-1">
+              {searchResults.pages.map((section) => (
+                <button
+                  key={section}
+                  type="button"
+                  onClick={() => {
+                    onNavigate?.(section)
+                    setQuickSearch('')
+                  }}
+                  className="w-full flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium text-[#344054] hover:bg-[#F9FAFB] cursor-pointer text-left"
+                >
+                  <span>{section}</span>
+                  <span className="text-[11px] text-[#667085]">Page</span>
+                </button>
+              ))}
+              {searchResults.customers.map((customer) => (
+                <button
+                  key={customer.id}
+                  type="button"
+                  onClick={() => {
+                    onNavigate?.('Customer 360', customer.id)
+                    setQuickSearch('')
+                  }}
+                  className="w-full flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs hover:bg-[#F9FAFB] cursor-pointer text-left"
+                >
+                  <span className="font-medium text-[#101828]">
+                    {customer.name}
+                  </span>
+                  <span className="text-[11px] text-[#667085]">
+                    {customer.plan} · {customer.status}
+                  </span>
+                </button>
+              ))}
+              {searchResults.pages.length === 0 &&
+                searchResults.customers.length === 0 && (
+                  <p className="px-2.5 py-2 text-xs text-[#667085]">
+                    No matching dashboards or customers.
+                  </p>
+                )}
+            </div>
+          )}
         </div>
       </div>
 
