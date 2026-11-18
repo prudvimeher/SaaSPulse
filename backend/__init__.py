@@ -1,1 +1,0 @@
-# SaaSPulse FastAPI backend package

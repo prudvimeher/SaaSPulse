@@ -1,28 +1,13 @@
 # SaaSPulse
 
-Full-stack SaaS analytics dashboard built with **React 19 + TypeScript + Vite + Tailwind CSS v4 + TanStack Query** on the frontend and **FastAPI** on the backend.
+Full-stack SaaS analytics dashboard built with **React 19 + TypeScript + Vite + Tailwind CSS v4 + TanStack Query** on the frontend and **Node + Express + TypeScript** on the backend.
 
 ## Architecture Overview
 
 - **Frontend (`src/`)**: Five interactive analytics views (`Executive Overview`, `Revenue Intelligence`, `Customer Retention`, `Customer Growth`, `Customer 360`) sharing synchronized date-range filtering, global customer search, light/dark themes, and server-state caching via `@tanstack/react-query`.
-- **Unified App & API Server (`server.ts`, `server/`)**: Express server on port `3000` serving the React frontend (Vite middleware in development, `dist/` static build in production) and `/api/*` analytics endpoints (`server/services.ts` + `server/dataset.ts`), or proxying `/api/*` to FastAPI (`127.0.0.1:8001`) when `backend/.venv` is active.
-- **FastAPI Backend (`backend/`)**: Optional Python FastAPI implementation serving the same dataset and API contracts (`backend/dataset.py`, `backend/schemas.py`, `backend/services.py`).
+- **Unified App & API Server (`server.ts`, `server/`)**: Express server on port `3000` serving the React frontend (Vite middleware in development, `dist/` static build in production) and `/api/*` analytics endpoints (`server/services.ts` + `server/dataset.ts`).
 
-## Optional Python Backend Setup (FastAPI)
-
-```bash
-python3 -m venv backend/.venv
-backend/.venv/bin/pip install -r backend/requirements.txt
-backend/.venv/bin/uvicorn backend.main:app --host 127.0.0.1 --port 8001
-```
-
-Run backend tests:
-
-```bash
-backend/.venv/bin/pytest -v backend/test_api.py
-```
-
-## Frontend Setup (React + Vite)
+## Setup & Development
 
 ```bash
 npm install
@@ -35,6 +20,34 @@ Build and lint:
 npm run build
 npm run lint
 ```
+
+## Automated Testing
+
+The project uses **Vitest** and **React Testing Library** for unit, component, and page integration tests, and **Playwright** for end-to-end browser tests.
+
+### Test Commands
+
+```bash
+# Run all unit, component, and integration tests once
+npm test
+
+# Run Vitest in watch mode during development
+npm run test:watch
+
+# Install Playwright Chromium browser (first-time setup if needed)
+npx playwright install chromium
+
+# Run end-to-end tests (auto-starts the Express + Vite server on port 3000)
+npm run test:e2e
+```
+
+### Test Layout & Configuration
+
+- `vitest.config.ts` & `src/test/setup.ts` — Vitest configuration with `jsdom` environment, `@testing-library/jest-dom` matchers, and automatic React Testing Library cleanup (server tests in `server/` run in Node via `@vitest-environment node`).
+- `server/services.test.ts` — Unit tests for analytics calculations, date window resolution, filtering, sorting, pagination, and error handling.
+- `src/utils/*.test.ts` & `src/api/client.test.ts` — Unit tests for date validation, currency/date formatters, and `apiGet` response/error parsing.
+- `src/components/**/*.test.tsx` & `src/pages/Customer360Page.test.tsx` — Component and page integration tests covering user interactions, SVG charts, and React Query states.
+- `playwright.config.ts` & `e2e/saaspulse.spec.ts` — Chromium E2E tests covering cross-dashboard navigation, custom date ranges, global search, Customer 360 workflows, CSV export, theme persistence, and API retry recovery.
 
 ## API Endpoints
 

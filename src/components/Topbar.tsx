@@ -24,8 +24,19 @@ export function Topbar({
   onToggleTheme,
 }: TopbarProps) {
   const [quickSearch, setQuickSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
   const searchInputRef = useRef<HTMLInputElement | null>(null)
+  const searchContainerRef = useRef<HTMLDivElement | null>(null)
+  const notificationsContainerRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearch(quickSearch)
+    }, 180)
+    return () => window.clearTimeout(timer)
+  }, [quickSearch])
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -35,15 +46,36 @@ export function Topbar({
       }
       if (event.key === 'Escape') {
         setQuickSearch('')
+        setDebouncedSearch('')
+        setIsSearchOpen(false)
+        setShowNotifications(false)
+      }
+    }
+    const handlePointerDown = (event: MouseEvent) => {
+      const target = event.target as Node
+      if (
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(target)
+      ) {
+        setIsSearchOpen(false)
+      }
+      if (
+        notificationsContainerRef.current &&
+        !notificationsContainerRef.current.contains(target)
+      ) {
         setShowNotifications(false)
       }
     }
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    document.addEventListener('mousedown', handlePointerDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      document.removeEventListener('mousedown', handlePointerDown)
+    }
   }, [])
 
   const { data: customerSearchData, isFetching: isSearchingCustomers } =
-    useGlobalCustomerSearchQuery(quickSearch)
+    useGlobalCustomerSearchQuery(debouncedSearch)
 
   const matchingPages = useMemo(() => {
     const q = quickSearch.trim().toLowerCase()
@@ -86,7 +118,7 @@ export function Topbar({
           </svg>
         </button>
 
-        <div className="relative w-full max-w-md">
+        <div className="relative w-full max-w-md" ref={searchContainerRef}>
           <svg
             className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#667085] dark:text-[#94A3B8]"
             viewBox="0 0 24 24"
@@ -104,7 +136,21 @@ export function Topbar({
             ref={searchInputRef}
             type="search"
             value={quickSearch}
-            onChange={(event) => setQuickSearch(event.target.value)}
+            onFocus={() => {
+              if (quickSearch.trim().length > 0) {
+                setIsSearchOpen(true)
+              }
+            }}
+            onChange={(event) => {
+              const nextValue = event.target.value
+              setQuickSearch(nextValue)
+              if (nextValue.trim().length === 0) {
+                setDebouncedSearch('')
+                setIsSearchOpen(false)
+              } else {
+                setIsSearchOpen(true)
+              }
+            }}
             placeholder="Search for customers, plans, or metrics..."
             aria-label="Global dashboard search"
             className="w-full h-9 rounded-lg border border-[#E4E7EC] dark:border-[#334155] bg-[#F9FAFB] dark:bg-[#0F172A] pl-9 pr-14 text-[13px] text-[#101828] dark:text-[#F1F5F9] placeholder:text-[#667085] dark:placeholder:text-[#64748B] focus:bg-white dark:focus:bg-[#111827] focus:border-[#5B4DF0] focus:outline-none focus:ring-2 focus:ring-[#5B4DF0]/15 transition-colors"
@@ -113,7 +159,7 @@ export function Topbar({
             ⌘ K
           </kbd>
 
-          {hasSearchQuery && (
+          {isSearchOpen && hasSearchQuery && (
             <div className="absolute left-0 right-0 top-10 z-30 rounded-xl border border-[#E4E7EC] dark:border-[#334155] bg-white dark:bg-[#111827] p-2 shadow-lg space-y-1">
               {searchResults.pages.map((section) => (
                 <button
@@ -122,6 +168,8 @@ export function Topbar({
                   onClick={() => {
                     onNavigate?.(section)
                     setQuickSearch('')
+                    setDebouncedSearch('')
+                    setIsSearchOpen(false)
                   }}
                   className="w-full flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs font-medium text-[#344054] dark:text-[#E2E8F0] hover:bg-[#F9FAFB] dark:hover:bg-[#1E293B] cursor-pointer text-left"
                 >
@@ -138,6 +186,8 @@ export function Topbar({
                   onClick={() => {
                     onNavigate?.('Customer 360', customer.id)
                     setQuickSearch('')
+                    setDebouncedSearch('')
+                    setIsSearchOpen(false)
                   }}
                   className="w-full flex items-center justify-between rounded-lg px-2.5 py-1.5 text-xs hover:bg-[#F9FAFB] dark:hover:bg-[#1E293B] cursor-pointer text-left"
                 >
@@ -152,7 +202,8 @@ export function Topbar({
               {searchResults.pages.length === 0 &&
                 searchResults.customers.length === 0 && (
                   <p className="px-2.5 py-2 text-xs text-[#667085] dark:text-[#94A3B8]">
-                    {isSearchingCustomers
+                    {isSearchingCustomers ||
+                    quickSearch.trim() !== debouncedSearch.trim()
                       ? 'Searching customers...'
                       : 'No matching dashboards or customers.'}
                   </p>
@@ -162,7 +213,10 @@ export function Topbar({
         </div>
       </div>
 
-      <div className="flex items-center gap-2 sm:gap-3 shrink-0 relative">
+      <div
+        className="flex items-center gap-2 sm:gap-3 shrink-0 relative"
+        ref={notificationsContainerRef}
+      >
         <button
           type="button"
           onClick={onToggleTheme}

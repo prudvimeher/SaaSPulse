@@ -1,5 +1,3 @@
-import { spawn, type ChildProcess } from 'node:child_process'
-import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import express, { type NextFunction, type Request, type Response } from 'express'
@@ -23,9 +21,6 @@ import type {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const PORT = Number(process.env.PORT ?? 3000)
-const FASTAPI_HOST = '127.0.0.1'
-const FASTAPI_PORT = 8001
-const FASTAPI_BASE_URL = `http://${FASTAPI_HOST}:${FASTAPI_PORT}`
 
 const VALID_DATE_RANGES = new Set<DateRangeKey>([
   'Last 7 Days',
@@ -51,46 +46,6 @@ const VALID_STATUSES = new Set<'All' | AccountStatus>([
   'Canceled',
 ])
 
-let fastapiProcess: ChildProcess | null = null
-let fastapiReady = false
-
-function tryStartFastApi(): void {
-  const venvUvicorn = path.resolve(__dirname, 'backend/.venv/bin/uvicorn')
-  if (!fs.existsSync(venvUvicorn)) {
-    return
-  }
-
-  fastapiProcess = spawn(
-    venvUvicorn,
-    ['backend.main:app', '--host', FASTAPI_HOST, '--port', String(FASTAPI_PORT)],
-    {
-      cwd: __dirname,
-      stdio: 'ignore',
-    },
-  )
-
-  fastapiProcess.on('exit', () => {
-    fastapiReady = false
-    fastapiProcess = null
-  })
-
-  const checkHealth = async () => {
-    for (let attempt = 0; attempt < 25; attempt += 1) {
-      if (!fastapiProcess) return
-      try {
-        const res = await fetch(`${FASTAPI_BASE_URL}/api/health`)
-        if (res.ok) {
-          fastapiReady = true
-          return
-        }
-      } catch {
-        // FastAPI still warming up
-      }
-      await new Promise((resolve) => setTimeout(resolve, 200))
-    }
-  }
-  void checkHealth()
-}
 
 function getQueryString(
   req: Request,
@@ -111,34 +66,7 @@ function parseDateRange(raw?: string): DateRangeKey {
 }
 
 async function createServer(): Promise<void> {
-  tryStartFastApi()
-
   const app = express()
-
-  // Prefer live FastAPI when available; seamlessly fall back to TypeScript API handlers otherwise.
-  app.use('/api', async (req: Request, res: Response, next: NextFunction) => {
-    if (!fastapiReady) {
-      next()
-      return
-    }
-    try {
-      const upstreamRes = await fetch(`${FASTAPI_BASE_URL}${req.originalUrl}`, {
-        method: req.method,
-        headers: {
-          Accept: 'application/json',
-        },
-      })
-      const bodyText = await upstreamRes.text()
-      const contentType = upstreamRes.headers.get('content-type')
-      if (contentType) {
-        res.setHeader('Content-Type', contentType)
-      }
-      res.status(upstreamRes.status).send(bodyText)
-    } catch {
-      fastapiReady = false
-      next()
-    }
-  })
 
   app.get('/api/health', (_req: Request, res: Response) => {
     res.json({ status: 'ok' })
@@ -313,10 +241,6 @@ async function createServer(): Promise<void> {
   })
 
   const shutdown = () => {
-    if (fastapiProcess) {
-      fastapiProcess.kill('SIGTERM')
-      fastapiProcess = null
-    }
     server.close(() => process.exit(0))
   }
 
