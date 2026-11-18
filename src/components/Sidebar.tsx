@@ -110,12 +110,12 @@ export function Sidebar({
   ]
 
   const content = (
-    <div className="flex h-full flex-col justify-between bg-white border-r border-[#E6E8EF] w-[232px] px-3.5 py-4">
+    <div className="flex h-full flex-col justify-between bg-white dark:bg-[#111827] border-r border-[#E6E8EF] dark:border-[#1F2937] w-[232px] px-3.5 py-4 transition-colors">
       <div>
         {/* Brand */}
         <div className="flex items-center justify-between px-2 pb-5">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md text-[#101828]">
+            <div className="flex h-7 w-7 items-center justify-center rounded-md text-[#101828] dark:text-[#F8FAFC]">
               <svg
                 className="h-5 w-5"
                 viewBox="0 0 24 24"
@@ -127,7 +127,7 @@ export function Sidebar({
                 <rect x="17" y="4" width="4" height="17" rx="1.2" />
               </svg>
             </div>
-            <span className="text-[16px] font-bold tracking-tight text-[#101828]">
+            <span className="text-[16px] font-bold tracking-tight text-[#101828] dark:text-[#F8FAFC]">
               SaaSPulse
             </span>
           </div>
@@ -136,7 +136,7 @@ export function Sidebar({
             type="button"
             onClick={onCloseMobile}
             aria-label="Close navigation menu"
-            className="lg:hidden rounded-md p-1 text-[#667085] hover:bg-[#F2F4F7] cursor-pointer"
+            className="lg:hidden rounded-md p-1 text-[#667085] dark:text-[#94A3B8] hover:bg-[#F2F4F7] dark:hover:bg-[#1E293B] cursor-pointer"
           >
             <svg
               className="h-4 w-4"
@@ -165,11 +165,17 @@ export function Sidebar({
                 }}
                 className={`w-full flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-medium transition-colors cursor-pointer whitespace-nowrap ${
                   isActive
-                    ? 'bg-[#F0EFFD] text-[#4F46E5] font-semibold'
-                    : 'text-[#344054] hover:bg-[#F9FAFB] hover:text-[#101828]'
+                    ? 'bg-[#F0EFFD] dark:bg-[#5B4DF0]/20 text-[#4F46E5] dark:text-[#A5B4FC] font-semibold'
+                    : 'text-[#344054] dark:text-[#CBD5E1] hover:bg-[#F9FAFB] dark:hover:bg-[#1E293B] hover:text-[#101828] dark:hover:text-[#F8FAFC]'
                 }`}
               >
-                <span className={isActive ? 'text-[#4F46E5]' : 'text-[#475467]'}>
+                <span
+                  className={
+                    isActive
+                      ? 'text-[#4F46E5] dark:text-[#A5B4FC]'
+                      : 'text-[#475467] dark:text-[#94A3B8]'
+                  }
+                >
                   {item.icon}
                 </span>
                 <span>{item.label}</span>
@@ -180,7 +186,7 @@ export function Sidebar({
 
         {/* Favorites */}
         <div className="mt-7 px-2.5">
-          <p className="text-[11px] font-semibold text-[#667085] mb-2">
+          <p className="text-[11px] font-semibold text-[#667085] dark:text-[#94A3B8] mb-2">
             Favorites
           </p>
           <div className="space-y-1 -mx-2.5">
@@ -190,10 +196,10 @@ export function Sidebar({
                 onSelectSection('Revenue Intelligence')
                 onCloseMobile()
               }}
-              className="w-full flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-medium text-[#344054] hover:bg-[#F9FAFB] transition-colors cursor-pointer whitespace-nowrap"
+              className="w-full flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-medium text-[#344054] dark:text-[#CBD5E1] hover:bg-[#F9FAFB] dark:hover:bg-[#1E293B] transition-colors cursor-pointer whitespace-nowrap"
             >
               <svg
-                className="h-4 w-4 text-[#475467]"
+                className="h-4 w-4 text-[#475467] dark:text-[#94A3B8]"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -209,10 +215,10 @@ export function Sidebar({
                 onSelectSection('Customer Retention')
                 onCloseMobile()
               }}
-              className="w-full flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-medium text-[#344054] hover:bg-[#F9FAFB] transition-colors cursor-pointer whitespace-nowrap"
+              className="w-full flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-medium text-[#344054] dark:text-[#CBD5E1] hover:bg-[#F9FAFB] dark:hover:bg-[#1E293B] transition-colors cursor-pointer whitespace-nowrap"
             >
               <svg
-                className="h-4 w-4 text-[#475467]"
+                className="h-4 w-4 text-[#475467] dark:text-[#94A3B8]"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -228,17 +234,17 @@ export function Sidebar({
       </div>
 
       {/* Bottom Utility Links */}
-      <div className="pt-4 border-t border-[#F2F4F7] space-y-1">
+      <div className="pt-4 border-t border-[#F2F4F7] dark:border-[#1F2937] space-y-1">
         <button
           type="button"
           onClick={() => {
             onSelectSection('Customer 360')
             onCloseMobile()
           }}
-          className="w-full flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-medium text-[#344054] hover:bg-[#F9FAFB] transition-colors cursor-pointer whitespace-nowrap"
+          className="w-full flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-medium text-[#344054] dark:text-[#CBD5E1] hover:bg-[#F9FAFB] dark:hover:bg-[#1E293B] transition-colors cursor-pointer whitespace-nowrap"
         >
           <svg
-            className="h-4 w-4 text-[#475467]"
+            className="h-4 w-4 text-[#475467] dark:text-[#94A3B8]"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -255,10 +261,10 @@ export function Sidebar({
             onSelectSection('Customer 360')
             onCloseMobile()
           }}
-          className="w-full flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-medium text-[#344054] hover:bg-[#F9FAFB] transition-colors cursor-pointer whitespace-nowrap"
+          className="w-full flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] font-medium text-[#344054] dark:text-[#CBD5E1] hover:bg-[#F9FAFB] dark:hover:bg-[#1E293B] transition-colors cursor-pointer whitespace-nowrap"
         >
           <svg
-            className="h-4 w-4 text-[#475467]"
+            className="h-4 w-4 text-[#475467] dark:text-[#94A3B8]"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"

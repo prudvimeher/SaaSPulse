@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { PlanBreakdownSlice } from '../../data/dashboardData'
+import type { PlanBreakdownSlice } from '../../types/analytics'
 import { formatCurrency } from '../../utils/formatters'
 
 interface DonutBreakdownChartProps {
@@ -18,6 +18,15 @@ export function DonutBreakdownChart({
   const [hoveredPlan, setHoveredPlan] = useState<string | null>(null)
 
   const total = slices.reduce((sum, item) => sum + item.amount, 0)
+
+  if (slices.length === 0 || total <= 0) {
+    return (
+      <div className="flex h-[180px] items-center justify-center rounded-lg border border-dashed border-[#EAECF0] dark:border-[#1F2937] text-xs text-[#667085] dark:text-[#94A3B8]">
+        No breakdown data available for the selected date range.
+      </div>
+    )
+  }
+
   const size = 160
   const strokeWidth = 24
   const radius = (size - strokeWidth) / 2
@@ -66,8 +75,8 @@ export function DonutBreakdownChart({
             cy={center}
             r={radius}
             fill="none"
-            stroke="#F2F4F7"
             strokeWidth={strokeWidth}
+            className="stroke-[#F2F4F7] dark:stroke-[#1F2937]"
           />
           {segments.map((segment) => {
             if (segment.dashLength <= 0) return null
@@ -93,10 +102,10 @@ export function DonutBreakdownChart({
         </svg>
 
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-          <span className="text-[17px] font-bold text-[#101828] font-tabular leading-tight">
+          <span className="text-[17px] font-bold text-[#101828] dark:text-[#F8FAFC] font-tabular leading-tight">
             {displayCenterValue}
           </span>
-          <span className="text-[11px] font-medium text-[#667085] mt-0.5 truncate max-w-[92px]">
+          <span className="text-[11px] font-medium text-[#667085] dark:text-[#94A3B8] mt-0.5 truncate max-w-[92px]">
             {displayCenterLabel}
           </span>
         </div>
@@ -111,7 +120,7 @@ export function DonutBreakdownChart({
               onMouseEnter={() => setHoveredPlan(slice.plan)}
               onMouseLeave={() => setHoveredPlan(null)}
               className={`flex items-center justify-between gap-3 rounded-md px-2 py-1 text-[13px] transition-colors cursor-default ${
-                isHovered ? 'bg-[#F9FAFB]' : ''
+                isHovered ? 'bg-[#F9FAFB] dark:bg-[#1E293B]' : ''
               }`}
             >
               <div className="flex items-center gap-2.5 min-w-0">
@@ -120,18 +129,18 @@ export function DonutBreakdownChart({
                   style={{ backgroundColor: slice.color }}
                   aria-hidden="true"
                 />
-                <span className="font-medium text-[#344054] truncate">
+                <span className="font-medium text-[#344054] dark:text-[#CBD5E1] truncate">
                   {slice.plan}
                 </span>
               </div>
 
               <div className="flex items-center gap-4 shrink-0 font-tabular">
-                <span className="font-semibold text-[#101828]">
+                <span className="font-semibold text-[#101828] dark:text-[#F8FAFC]">
                   {valueFormat === 'currency'
                     ? formatCurrency(slice.amount)
                     : slice.amount.toLocaleString('en-US')}
                 </span>
-                <span className="w-11 text-right text-xs text-[#667085]">
+                <span className="w-11 text-right text-xs text-[#667085] dark:text-[#94A3B8]">
                   {slice.percentage.toFixed(1)}%
                 </span>
               </div>

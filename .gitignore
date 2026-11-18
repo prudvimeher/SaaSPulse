@@ -45,3 +45,9 @@ desktop.ini
 # Temporary files
 *.tmp
 *.temp
+
+# Python / FastAPI backend
+backend/.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/

@@ -1,4 +1,4 @@
-import type { InsightData } from '../data/dashboardData'
+import type { InsightData } from '../types/analytics'
 
 interface InsightsPanelProps {
   title: string
@@ -11,7 +11,7 @@ function renderInsightIcon(icon: InsightData['icon']) {
     case 'trendUp':
       return (
         <svg
-          className="h-4 w-4 text-[#344054]"
+          className="h-4 w-4 text-[#344054] dark:text-[#CBD5E1]"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -26,7 +26,7 @@ function renderInsightIcon(icon: InsightData['icon']) {
     case 'trendDown':
       return (
         <svg
-          className="h-4 w-4 text-[#344054]"
+          className="h-4 w-4 text-[#344054] dark:text-[#CBD5E1]"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -41,7 +41,7 @@ function renderInsightIcon(icon: InsightData['icon']) {
     case 'users':
       return (
         <svg
-          className="h-4 w-4 text-[#344054]"
+          className="h-4 w-4 text-[#344054] dark:text-[#CBD5E1]"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -58,7 +58,7 @@ function renderInsightIcon(icon: InsightData['icon']) {
     case 'layers':
       return (
         <svg
-          className="h-4 w-4 text-[#344054]"
+          className="h-4 w-4 text-[#344054] dark:text-[#CBD5E1]"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -74,7 +74,7 @@ function renderInsightIcon(icon: InsightData['icon']) {
     case 'chart':
       return (
         <svg
-          className="h-4 w-4 text-[#344054]"
+          className="h-4 w-4 text-[#344054] dark:text-[#CBD5E1]"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -92,9 +92,12 @@ function renderInsightIcon(icon: InsightData['icon']) {
 
 export function InsightsPanel({ title, subtitle, insights }: InsightsPanelProps) {
   return (
-    <section className="bg-white border border-[#E6E8EF] rounded-xl shadow-[0_1px_2px_rgba(16,24,40,0.04)] p-5 flex flex-col gap-3.5 min-w-0 h-full">
+    <section className="bg-white dark:bg-[#111827] border border-[#E6E8EF] dark:border-[#1F2937] rounded-xl shadow-[0_1px_2px_rgba(16,24,40,0.04)] p-5 flex flex-col gap-3.5 min-w-0 h-full transition-colors">
       <div className="flex items-start gap-2.5">
-        <div className="mt-0.5 text-[#475467] shrink-0" aria-hidden="true">
+        <div
+          className="mt-0.5 text-[#475467] dark:text-[#94A3B8] shrink-0"
+          aria-hidden="true"
+        >
           <svg
             className="h-4 w-4"
             viewBox="0 0 24 24"
@@ -108,10 +111,10 @@ export function InsightsPanel({ title, subtitle, insights }: InsightsPanelProps)
           </svg>
         </div>
         <div className="min-w-0">
-          <h2 className="text-[15px] font-semibold text-[#101828] leading-5">
+          <h2 className="text-[15px] font-semibold text-[#101828] dark:text-[#F8FAFC] leading-5">
             {title}
           </h2>
-          <p className="text-[12px] text-[#667085] mt-0.5 leading-4">
+          <p className="text-[12px] text-[#667085] dark:text-[#94A3B8] mt-0.5 leading-4">
             {subtitle}
           </p>
         </div>
@@ -121,19 +124,19 @@ export function InsightsPanel({ title, subtitle, insights }: InsightsPanelProps)
         {insights.map((insight) => (
           <div
             key={insight.id}
-            className="rounded-xl border border-[#EAECF0] bg-[#FCFCFD] px-3.5 py-3 flex items-start gap-3"
+            className="rounded-xl border border-[#EAECF0] dark:border-[#1F2937] bg-[#FCFCFD] dark:bg-[#161F33] px-3.5 py-3 flex items-start gap-3"
           >
             <div
-              className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#EAECF0] bg-white"
+              className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#EAECF0] dark:border-[#334155] bg-white dark:bg-[#111827]"
               aria-hidden="true"
             >
               {renderInsightIcon(insight.icon)}
             </div>
             <div className="min-w-0">
-              <p className="text-[13px] font-semibold text-[#101828] leading-4">
+              <p className="text-[13px] font-semibold text-[#101828] dark:text-[#F8FAFC] leading-4">
                 {insight.title}
               </p>
-              <p className="text-[12px] text-[#667085] mt-1 leading-4">
+              <p className="text-[12px] text-[#667085] dark:text-[#94A3B8] mt-1 leading-4">
                 {insight.description}
               </p>
             </div>

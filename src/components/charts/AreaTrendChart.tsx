@@ -32,6 +32,14 @@ export function AreaTrendChart({
   const gradientId = useId()
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
+  if (data.length === 0) {
+    return (
+      <div className="flex h-[200px] items-center justify-center rounded-lg border border-dashed border-[#EAECF0] dark:border-[#1F2937] text-xs text-[#667085] dark:text-[#94A3B8]">
+        No trend data available for the selected date range.
+      </div>
+    )
+  }
+
   const width = 560
   const height = 220
   const padLeft = 52
@@ -62,7 +70,7 @@ export function AreaTrendChart({
     .map((pt, idx) => `${idx === 0 ? 'M' : 'L'} ${pt.x} ${pt.y}`)
     .join(' ')
   const areaPath =
-    coords.length > 0
+    coords.length > 1
       ? `${linePath} L ${coords[coords.length - 1].x} ${padTop + innerHeight} L ${coords[0].x} ${padTop + innerHeight} Z`
       : ''
 
@@ -98,14 +106,14 @@ export function AreaTrendChart({
                 y1={y}
                 x2={width - padRight}
                 y2={y}
-                stroke="#EAECF0"
                 strokeWidth="1"
+                className="stroke-[#EAECF0] dark:stroke-[#1F2937]"
               />
               <text
                 x={padLeft - 10}
                 y={y + 4}
                 textAnchor="end"
-                className="fill-[#667085] text-[11px] font-tabular"
+                className="fill-[#667085] dark:fill-[#94A3B8] text-[11px] font-tabular"
               >
                 {formatYAxis(tick)}
               </text>
@@ -115,7 +123,7 @@ export function AreaTrendChart({
 
         {/* Area and Line */}
         {areaPath && <path d={areaPath} fill={`url(#${gradientId})`} />}
-        {linePath && (
+        {coords.length > 1 && linePath && (
           <path
             d={linePath}
             fill="none"
@@ -133,9 +141,9 @@ export function AreaTrendChart({
             y1={padTop}
             x2={activePoint.x}
             y2={padTop + innerHeight}
-            stroke="#98A2B3"
             strokeWidth="1"
             strokeDasharray="3 3"
+            className="stroke-[#98A2B3] dark:stroke-[#64748B]"
           />
         )}
 
@@ -148,7 +156,7 @@ export function AreaTrendChart({
                 x={pt.x}
                 y={height - 6}
                 textAnchor="middle"
-                className="fill-[#667085] text-[11px] font-medium"
+                className="fill-[#667085] dark:fill-[#94A3B8] text-[11px] font-medium"
               >
                 {pt.month}
               </text>
@@ -157,9 +165,10 @@ export function AreaTrendChart({
                 cx={pt.x}
                 cy={pt.y}
                 r={isActive ? 4.5 : 3.25}
-                fill={isActive ? strokeColor : '#FFFFFF'}
+                fill={isActive ? strokeColor : undefined}
                 stroke={strokeColor}
                 strokeWidth="2"
+                className={isActive ? '' : 'fill-white dark:fill-[#111827]'}
               />
 
               {/* Larger invisible hover area */}
@@ -196,14 +205,13 @@ export function AreaTrendChart({
                 width={boxWidth}
                 height={boxHeight}
                 rx="8"
-                fill="#FFFFFF"
-                stroke="#E4E7EC"
                 strokeWidth="1"
+                className="fill-white dark:fill-[#0F172A] stroke-[#E4E7EC] dark:stroke-[#334155]"
               />
               <text
                 x={boxX + 10}
                 y={boxY + 15}
-                className="fill-[#667085] text-[10px] font-medium"
+                className="fill-[#667085] dark:fill-[#94A3B8] text-[10px] font-medium"
               >
                 {activePoint.fullLabel}
               </text>
@@ -216,7 +224,7 @@ export function AreaTrendChart({
               <text
                 x={boxX + 22}
                 y={boxY + 31}
-                className="fill-[#101828] text-[11px] font-semibold font-tabular"
+                className="fill-[#101828] dark:fill-[#F8FAFC] text-[11px] font-semibold font-tabular"
               >
                 {valueLabel}: {formatValue(activePoint.value)}
               </text>

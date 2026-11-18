@@ -1,4 +1,4 @@
-export type SubscriptionPlan = 'Starter' | 'Pro' | 'Business'
+export type SubscriptionPlan = 'Starter' | 'Pro' | 'Business' | 'Enterprise'
 
 export type AccountStatus = 'Active' | 'Past Due' | 'Canceled'
 

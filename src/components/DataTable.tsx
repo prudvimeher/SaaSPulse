@@ -28,7 +28,7 @@ export function DataTable<T>({
 }: DataTableProps<T>) {
   if (data.length === 0) {
     return (
-      <div className="border-t border-[#EAECF0] px-5 py-10 text-center text-xs text-[#667085]">
+      <div className="border-t border-[#EAECF0] dark:border-[#1F2937] px-5 py-10 text-center text-xs text-[#667085] dark:text-[#94A3B8]">
         {emptyMessage}
       </div>
     )
@@ -38,7 +38,7 @@ export function DataTable<T>({
     <div className="overflow-x-auto">
       <table className="w-full min-w-[540px] border-collapse text-left">
         <thead>
-          <tr className="border-y border-[#EAECF0] bg-[#FCFCFD] text-[12px] font-medium text-[#475467]">
+          <tr className="border-y border-[#EAECF0] dark:border-[#1F2937] bg-[#FCFCFD] dark:bg-[#161F33] text-[12px] font-medium text-[#475467] dark:text-[#94A3B8]">
             {columns.map((column, index) => {
               const alignClass =
                 column.align === 'right'
@@ -66,13 +66,15 @@ export function DataTable<T>({
           </tr>
         </thead>
 
-        <tbody className="divide-y divide-[#EAECF0]">
+        <tbody className="divide-y divide-[#EAECF0] dark:divide-[#1F2937]">
           {data.map((row) => (
             <tr
               key={getRowKey(row)}
               onClick={onRowClick ? () => onRowClick(row) : undefined}
-              className={`bg-white transition-colors ${
-                onRowClick ? 'hover:bg-[#F9FAFB] cursor-pointer' : ''
+              className={`bg-white dark:bg-[#111827] transition-colors ${
+                onRowClick
+                  ? 'hover:bg-[#F9FAFB] dark:hover:bg-[#1E293B] cursor-pointer'
+                  : ''
               }`}
             >
               {columns.map((column, index) => {
@@ -92,7 +94,7 @@ export function DataTable<T>({
                 return (
                   <td
                     key={column.key}
-                    className={`py-3 align-middle text-[13px] text-[#344054] ${alignClass} ${padClass} ${column.className ?? ''}`}
+                    className={`py-3 align-middle text-[13px] text-[#344054] dark:text-[#CBD5E1] ${alignClass} ${padClass} ${column.className ?? ''}`}
                   >
                     {column.render(row)}
                   </td>
@@ -104,7 +106,7 @@ export function DataTable<T>({
 
         {showFooter && (
           <tfoot>
-            <tr className="border-t border-[#EAECF0] bg-[#FCFCFD] text-[13px] font-semibold text-[#101828]">
+            <tr className="border-t border-[#EAECF0] dark:border-[#1F2937] bg-[#FCFCFD] dark:bg-[#161F33] text-[13px] font-semibold text-[#101828] dark:text-[#F8FAFC]">
               {columns.map((column, index) => {
                 const alignClass =
                   column.align === 'right'

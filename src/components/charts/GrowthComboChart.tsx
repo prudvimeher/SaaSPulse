@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { GrowthTrendPoint } from '../../data/dashboardData'
+import type { GrowthTrendPoint } from '../../types/analytics'
 
 interface GrowthComboChartProps {
   data: GrowthTrendPoint[]
@@ -7,6 +7,14 @@ interface GrowthComboChartProps {
 
 export function GrowthComboChart({ data }: GrowthComboChartProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+
+  if (data.length === 0) {
+    return (
+      <div className="flex h-[220px] items-center justify-center rounded-lg border border-dashed border-[#EAECF0] dark:border-[#1F2937] text-xs text-[#667085] dark:text-[#94A3B8]">
+        No growth trend data available for the selected date range.
+      </div>
+    )
+  }
 
   const width = 560
   const height = 215
@@ -73,14 +81,14 @@ export function GrowthComboChart({ data }: GrowthComboChartProps) {
                 y1={y}
                 x2={width - padRight}
                 y2={y}
-                stroke="#EAECF0"
                 strokeWidth="1"
+                className="stroke-[#EAECF0] dark:stroke-[#1F2937]"
               />
               <text
                 x={padLeft - 8}
                 y={y + 3.5}
                 textAnchor="end"
-                className="fill-[#667085] text-[10.5px] font-tabular"
+                className="fill-[#667085] dark:fill-[#94A3B8] text-[10.5px] font-tabular"
               >
                 {tick}
               </text>
@@ -108,12 +116,17 @@ export function GrowthComboChart({ data }: GrowthComboChartProps) {
                 height={pt.lostHeight}
                 rx="3"
                 fill={isActive ? '#CBD5E1' : '#E2E8F0'}
+                className={
+                  isActive
+                    ? 'dark:fill-[#64748B]'
+                    : 'dark:fill-[#475569]'
+                }
               />
               <text
                 x={pt.centerX}
                 y={height - 6}
                 textAnchor="middle"
-                className="fill-[#667085] text-[11px] font-medium"
+                className="fill-[#667085] dark:fill-[#94A3B8] text-[11px] font-medium"
               >
                 {pt.month}
               </text>
@@ -128,21 +141,21 @@ export function GrowthComboChart({ data }: GrowthComboChartProps) {
             y1={padTop}
             x2={activePoint.centerX}
             y2={padTop + innerHeight}
-            stroke="#98A2B3"
             strokeWidth="1"
             strokeDasharray="3 3"
+            className="stroke-[#98A2B3] dark:stroke-[#64748B]"
           />
         )}
 
         {/* Net Growth Line */}
-        {netLinePath && (
+        {points.length > 1 && netLinePath && (
           <path
             d={netLinePath}
             fill="none"
-            stroke="#312E81"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
+            className="stroke-[#312E81] dark:stroke-[#A5B4FC]"
           />
         )}
 
@@ -155,9 +168,8 @@ export function GrowthComboChart({ data }: GrowthComboChartProps) {
                 cx={pt.centerX}
                 cy={pt.netY}
                 r={isActive ? 4.25 : 3.25}
-                fill="#FFFFFF"
-                stroke="#312E81"
                 strokeWidth="2"
+                className="fill-white dark:fill-[#111827] stroke-[#312E81] dark:stroke-[#A5B4FC]"
               />
               <rect
                 x={pt.centerX - slotWidth / 2}
@@ -191,14 +203,13 @@ export function GrowthComboChart({ data }: GrowthComboChartProps) {
                 width={boxWidth}
                 height={boxHeight}
                 rx="8"
-                fill="#FFFFFF"
-                stroke="#E4E7EC"
                 strokeWidth="1"
+                className="fill-white dark:fill-[#0F172A] stroke-[#E4E7EC] dark:stroke-[#334155]"
               />
               <text
                 x={boxX + 9}
                 y={boxY + 15}
-                className="fill-[#101828] text-[10px] font-semibold"
+                className="fill-[#101828] dark:fill-[#F8FAFC] text-[10px] font-semibold"
               >
                 {activePoint.fullLabel}
               </text>
@@ -206,15 +217,20 @@ export function GrowthComboChart({ data }: GrowthComboChartProps) {
               <text
                 x={boxX + 20}
                 y={boxY + 30}
-                className="fill-[#475467] text-[9.5px] font-tabular"
+                className="fill-[#475467] dark:fill-[#CBD5E1] text-[9.5px] font-tabular"
               >
                 New: {activePoint.newCustomers}
               </text>
-              <circle cx={boxX + 13} cy={boxY + 40} r="2.5" fill="#CBD5E1" />
+              <circle
+                cx={boxX + 13}
+                cy={boxY + 40}
+                r="2.5"
+                className="fill-[#CBD5E1] dark:fill-[#64748B]"
+              />
               <text
                 x={boxX + 20}
                 y={boxY + 43}
-                className="fill-[#475467] text-[9.5px] font-tabular"
+                className="fill-[#475467] dark:fill-[#CBD5E1] text-[9.5px] font-tabular"
               >
                 Lost: {activePoint.lostCustomers}
               </text>
@@ -222,14 +238,13 @@ export function GrowthComboChart({ data }: GrowthComboChartProps) {
                 cx={boxX + 13}
                 cy={boxY + 53}
                 r="2.5"
-                fill="#FFFFFF"
-                stroke="#312E81"
                 strokeWidth="1.5"
+                className="fill-white dark:fill-[#111827] stroke-[#312E81] dark:stroke-[#A5B4FC]"
               />
               <text
                 x={boxX + 20}
                 y={boxY + 56}
-                className="fill-[#101828] text-[9.5px] font-semibold font-tabular"
+                className="fill-[#101828] dark:fill-[#F8FAFC] text-[9.5px] font-semibold font-tabular"
               >
                 Net: +{activePoint.netGrowth}
               </text>
@@ -239,17 +254,17 @@ export function GrowthComboChart({ data }: GrowthComboChartProps) {
       </svg>
 
       {/* Legend */}
-      <div className="flex flex-wrap items-center justify-center gap-5 text-[11.5px] font-medium text-[#475467]">
+      <div className="flex flex-wrap items-center justify-center gap-5 text-[11.5px] font-medium text-[#475467] dark:text-[#94A3B8]">
         <div className="flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-[2px] bg-[#A59FF7]" aria-hidden="true" />
           <span>New Customers</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-[2px] bg-[#D1D5DB]" aria-hidden="true" />
+          <span className="h-2.5 w-2.5 rounded-[2px] bg-[#D1D5DB] dark:bg-[#475569]" aria-hidden="true" />
           <span>Lost Customers</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="inline-flex h-2.5 w-2.5 items-center justify-center rounded-full border-2 border-[#312E81] bg-white" aria-hidden="true" />
+          <span className="inline-flex h-2.5 w-2.5 items-center justify-center rounded-full border-2 border-[#312E81] dark:border-[#A5B4FC] bg-white dark:bg-[#111827]" aria-hidden="true" />
           <span>Net Growth</span>
         </div>
       </div>
